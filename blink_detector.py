@@ -14,7 +14,7 @@ Each blink event records:
 
 from __future__ import annotations
 from dataclasses import dataclass, field
-from config import EAR_THRESHOLD, BLINK_CONSEC_FRAMES
+from config import EAR_THRESHOLD, BLINK_CONSEC_FRAMES, MAX_BLINK_DURATION_S
 
 
 @dataclass
@@ -45,10 +45,12 @@ class BlinkDetector:
         self,
         ear_threshold: float = EAR_THRESHOLD,
         consec_frames: int   = BLINK_CONSEC_FRAMES,
+        max_blink_dur: float = MAX_BLINK_DURATION_S,
         fps: float           = 25.0,
     ):
         self.ear_threshold  = ear_threshold
         self.consec_frames  = consec_frames
+        self.max_blink_dur  = max_blink_dur
         self.fps            = fps
 
         self.blinks: list[BlinkEvent] = []
@@ -102,8 +104,10 @@ class BlinkDetector:
                     left_ear_min  = self._left_ear_min,
                     right_ear_min = self._right_ear_min,
                 )
-                self.blinks.append(event)
-                completed = event
+                # Only keep physiologically plausible blinks
+                if event.duration <= self.max_blink_dur:
+                    self.blinks.append(event)
+                    completed = event
             # Reset state
             self._consec_count  = 0
             self._in_blink      = False

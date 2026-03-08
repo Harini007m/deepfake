@@ -76,6 +76,7 @@ class DeepfakeDetectionPipeline:
         video_info  = reader.info()
         total       = reader.total_frames
         fps         = reader.fps
+        video_duration = reader.duration_seconds  # cache before release
 
         left_ears:   list[float] = []
         right_ears:  list[float] = []
@@ -152,7 +153,7 @@ class DeepfakeDetectionPipeline:
             blinks            = blinker.blinks,
             left_ears         = left_ears,
             right_ears        = right_ears,
-            video_duration_s  = reader.duration_seconds,
+            video_duration_s  = video_duration,
             fps               = fps,
         )
 

@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+venv/
+.env/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Test / temp
+.pytest_cache/
+*.txt
+!requirements.txt
+
+# Output
+results/
+
+# MediaPipe model (large binary)
+face_landmarker.task

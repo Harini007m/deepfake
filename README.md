@@ -128,6 +128,7 @@ deepfake/
 ├── cli.py                    # 💻  Command-line interface (single + batch)
 ├── gui.py                    # 🖥️  Dark-themed Tkinter GUI
 ├── dataset_utils.py          # 📁  Celeb-DF / UADFV batch evaluator
+├── run_celeb_df.py           # 🎬  Celeb-DF v2 dedicated runner
 │
 ├── tests/
 │   └── test_pipeline.py      # ✅  16 pytest unit & integration tests
@@ -148,8 +149,8 @@ deepfake/
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-username/deepfake-blink-detector.git
-cd deepfake-blink-detector
+git clone https://github.com/Harini007m/deepfake.git
+cd deepfake
 
 # 2. (Recommended) Create a virtual environment
 python -m venv venv
@@ -158,6 +159,9 @@ venv\Scripts\activate      # Windows
 
 # 3. Install dependencies
 pip install -r requirements.txt
+
+# 4. Download the MediaPipe Face Landmarker model
+python -c "import urllib.request; urllib.request.urlretrieve('https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task', 'face_landmarker.task'); print('Model downloaded!')"
 ```
 
 **`requirements.txt` installs:**
@@ -256,29 +260,53 @@ The dark-themed GUI provides:
 
 ---
 
-### 📁 Dataset Evaluation
+### 📁 Celeb-DF v2 Dataset Evaluation
 
-Evaluate the detector against standard deepfake datasets like **Celeb-DF v2** or **UADFV**.
+The system **natively supports the Celeb-DF v2** dataset layout. The dataset is expected at `D:\archive`:
 
-**Expected folder layout:**
 ```
-dataset_root/
-    real/          ←  genuine face videos
-    fake/          ←  deepfake videos
+D:\archive/
+    Celeb-real/         ← 590 real celebrity videos
+    YouTube-real/       ← 300 real YouTube videos
+    Celeb-synthesis/    ← 5639 deepfake videos
 ```
 
-**Run evaluation:**
+`Celeb-real` + `YouTube-real` are combined into the **REAL** class.  
+`Celeb-synthesis` is the **FAKE** class.
+
+**Using the dedicated runner (`run_celeb_df.py`):**
 ```bash
-python dataset_utils.py --dataset D:\datasets\CelebDF --output-dir results\celebdf
+# Quick test — 5 videos per class
+python run_celeb_df.py --quick
 
-# Limit to 20 videos per class for a quick test
-python dataset_utils.py --dataset D:\datasets\UADFV --max-per-class 20
+# Medium run — 50 videos per class
+python run_celeb_df.py --max 50
+
+# Full dataset — all 6529 videos
+python run_celeb_df.py --full
+
+# Analyse a single video (with ground-truth comparison)
+python run_celeb_df.py --single D:\archive\Celeb-real\id0_0000.mp4
+
+# Compare one real vs one fake side-by-side
+python run_celeb_df.py --compare \
+    --real-video D:\archive\Celeb-real\id0_0000.mp4 \
+    --fake-video D:\archive\Celeb-synthesis\id0_id16_0000.mp4
+```
+
+**Or using dataset_utils.py directly:**
+```bash
+python dataset_utils.py --dataset D:\archive --output-dir results\celebdf
+python dataset_utils.py --dataset D:\archive --max-per-class 20 --no-reports
 ```
 
 **Outputs:**
-- Per-video results in `results/celebdf/dataset_results.csv`
-- Accuracy / Precision / Recall / F1 summary in `dataset_summary.json`
-- Individual PNG reports for every video
+- Per-video results → `results/celeb_df/dataset_results.csv`
+- Accuracy / Precision / Recall / F1 → `results/celeb_df/dataset_summary.json`
+- Real vs Fake comparison charts → `results/celeb_df/real_vs_fake_comparison.png`
+- Individual PNG reports for every video (unless `--no-reports`)
+
+The system also supports **generic** dataset layouts (`real/` + `fake/` folders) and **UADFV**.
 
 ---
 
