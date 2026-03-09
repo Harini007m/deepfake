@@ -31,7 +31,7 @@ class DeepfakeDetectorGUI(tk.Tk):
     GREEN    = "#2cb67d"
     YELLOW   = "#f4c430"
     RED      = "#e53e3e"
-    TEXT     = "#ffffffcc"
+    TEXT     = "#e8e8e8"
     SUBTEXT  = "#aaaaaa"
 
     def __init__(self):
@@ -57,7 +57,7 @@ class DeepfakeDetectorGUI(tk.Tk):
         title_frame.pack(fill="x")
         tk.Label(
             title_frame,
-            text="👁  Eye-Blink Deepfake Detection System",
+            text="Eye-Blink Deepfake Detection System",
             font=("Segoe UI", 17, "bold"),
             fg="white", bg=self.BG,
         ).pack()
@@ -110,7 +110,7 @@ class DeepfakeDetectorGUI(tk.Tk):
         # ── Run button ────────────────────────────────────────────────────
         run_frame = tk.Frame(self, bg=self.BG, pady=8)
         run_frame.pack(fill="x", padx=20)
-        self._run_btn = self._make_button(run_frame, "▶  Analyse Video", self._start_analysis, self.GREEN)
+        self._run_btn = self._make_button(run_frame, "[>]  Analyse Video", self._start_analysis, self.GREEN)
         self._run_btn.pack(side="left")
 
         self._progress_var = tk.DoubleVar(value=0)
@@ -206,7 +206,7 @@ class DeepfakeDetectorGUI(tk.Tk):
             messagebox.showerror("File Not Found", f"Cannot find:\n{path}")
             return
 
-        self._run_btn.config(state="disabled", text="Analysing…")
+        self._run_btn.config(state="disabled", text="Analysing...")
         self._clear_results()
         self._progress_var.set(0)
         self._progress_lbl.config(text="Starting…")
@@ -266,11 +266,11 @@ class DeepfakeDetectorGUI(tk.Tk):
             w.destroy()
 
     def _show_error(self, msg: str, tb: str):
-        self._run_btn.config(state="normal", text="▶  Analyse Video")
+        self._run_btn.config(state="normal", text="[>]  Analyse Video")
         self._progress_lbl.config(text="Error.")
         self._clear_results()
         tk.Label(
-            self._results_frame, text=f"❌  Error: {msg}",
+            self._results_frame, text=f"[ERROR]  {msg}",
             fg=self.RED, bg=self.SURFACE2, font=("Segoe UI", 10, "bold"),
             wraplength=700, justify="left",
         ).pack(anchor="w", pady=4)
@@ -282,7 +282,7 @@ class DeepfakeDetectorGUI(tk.Tk):
 
     def _show_results(self, results: dict):
         self._results = results
-        self._run_btn.config(state="normal", text="▶  Analyse Video")
+        self._run_btn.config(state="normal", text="[>]  Analyse Video")
         self._progress_var.set(100)
         self._progress_lbl.config(text=f"Done in {results['elapsed_s']} s")
         self._clear_results()
@@ -291,9 +291,9 @@ class DeepfakeDetectorGUI(tk.Tk):
         a = results["analysis"]
 
         verdict_map = {
-            "REAL":            (self.GREEN,  "✅  REAL"),
-            "SUSPICIOUS":      (self.YELLOW, "⚠️  SUSPICIOUS"),
-            "LIKELY DEEPFAKE": (self.RED,    "🚨  LIKELY DEEPFAKE"),
+            "REAL":            (self.GREEN,  "[OK]  REAL"),
+            "SUSPICIOUS":      (self.YELLOW, "[!!]  SUSPICIOUS"),
+            "LIKELY DEEPFAKE": (self.RED,    "[!!]  LIKELY DEEPFAKE"),
         }
         v_color, v_label = verdict_map.get(a["verdict"], (self.SUBTEXT, a["verdict"]))
 
@@ -345,8 +345,8 @@ class DeepfakeDetectorGUI(tk.Tk):
         # Buttons
         btn_row = tk.Frame(self._results_frame, bg=self.SURFACE2)
         btn_row.grid(row=3, column=0, columnspan=2, sticky="ew", pady=(12, 0))
-        self._make_button(btn_row, "📊 Open Report PNG", self._open_report, self.ACCENT).pack(side="left", padx=4)
-        self._make_button(btn_row, "🔁 Analyse Another", self._reset, self.SURFACE).pack(side="left", padx=4)
+        self._make_button(btn_row, "[Chart] Open Report PNG", self._open_report, self.ACCENT).pack(side="left", padx=4)
+        self._make_button(btn_row, "[Reset] Analyse Another", self._reset, self.SURFACE).pack(side="left", padx=4)
 
     def _section(self, parent, title: str, rows: list[tuple[str, str]]):
         tk.Label(parent, text=title, font=("Segoe UI", 10, "bold"),
